@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Loader2, Mail, Lock, User, TestTube } from 'lucide-react';
+import { Loader2, Mail, Lock, User } from 'lucide-react';
 import { signIn, signUp } from '@/lib/auth';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -36,13 +36,6 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     fullName: '',
     confirmPassword: '',
   });
-
-  // Test credentials
-  const testCredentials = [
-    { email: 'test@giftai.com', password: 'test123', name: 'Test User' },
-    { email: 'demo@giftai.com', password: 'demo123', name: 'Demo User' },
-    { email: 'john@example.com', password: 'john123', name: 'John Doe' },
-  ];
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,22 +83,6 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     }
   };
 
-  const handleTestLogin = async (credentials: { email: string; password: string; name: string }) => {
-    setLoading(true);
-    setError('');
-
-    try {
-      await signIn(credentials.email, credentials.password);
-      await refreshProfile();
-      onSuccess?.();
-      onClose();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign in with test credentials');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const resetForm = () => {
     setSignInData({ email: '', password: '' });
     setSignUpData({ email: '', password: '', fullName: '', confirmPassword: '' });
@@ -128,39 +105,6 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             Welcome to GiftAI
           </DialogTitle>
         </DialogHeader>
-
-        {/* Test Credentials Section */}
-        <Card className="mb-4 bg-blue-50 border-blue-200">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-blue-800 flex items-center gap-2">
-              <TestTube className="h-4 w-4" />
-              Test Credentials
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p className="text-xs text-blue-700 mb-3">
-              Use these test accounts to try out the app features:
-            </p>
-            {testCredentials.map((cred, index) => (
-              <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
-                <div className="text-xs">
-                  <div className="font-medium text-gray-800">{cred.name}</div>
-                  <div className="text-gray-600">{cred.email}</div>
-                  <div className="text-gray-500">Password: {cred.password}</div>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleTestLogin(cred)}
-                  disabled={loading}
-                  className="text-xs h-8 px-3"
-                >
-                  {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Use'}
-                </Button>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">

@@ -48,6 +48,7 @@ export function useAuthState() {
   useEffect(() => {
     // Get initial user
     getCurrentUser().then((user) => {
+      console.log('Initial user:', user?.id);
       setUser(user);
       setLoading(false);
     }).catch((error) => {

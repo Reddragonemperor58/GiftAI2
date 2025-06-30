@@ -241,7 +241,7 @@ export default function Home() {
                   GiftAI
                 </h1>
               </div>
-              <div className="flex justify-end">
+              <div className="flex justify-end min-w-[120px]">
                 {user ? (
                   <UserMenu 
                     onViewHistory={() => setShowChatSidebar(true)}
@@ -531,7 +531,15 @@ export default function Home() {
       </div>
 
       {/* Modals */}
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+        onSuccess={() => {
+          setShowAuthModal(false);
+          // Force a re-render to show the UserMenu
+          window.location.reload();
+        }}
+      />
     </div>
   );
 }

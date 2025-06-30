@@ -28,6 +28,8 @@ export function UserMenu({ onViewHistory, onViewFavorites }: UserMenuProps) {
     setLoading(true);
     try {
       await signOut();
+      // Force page reload to clear all state
+      window.location.href = '/';
     } catch (error) {
       console.error('Error signing out:', error);
     } finally {
@@ -35,19 +37,22 @@ export function UserMenu({ onViewHistory, onViewFavorites }: UserMenuProps) {
     }
   };
 
-  if (!user || !profile) return null;
+  if (!user) return null;
 
-  const initials = profile.full_name
+  const initials = profile?.full_name
     ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase()
-    : profile.email[0].toUpperCase();
+    : user.email?.[0]?.toUpperCase() || 'U';
+
+  const displayName = profile?.full_name || 'User';
+  const displayEmail = profile?.email || user.email || '';
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-purple-50">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={profile.avatar_url || ''} alt={profile.full_name || profile.email} />
-            <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+            <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
+            <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white font-semibold">
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -57,10 +62,10 @@ export function UserMenu({ onViewHistory, onViewFavorites }: UserMenuProps) {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {profile.full_name || 'User'}
+              {displayName}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {profile.email}
+              {displayEmail}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -80,7 +85,7 @@ export function UserMenu({ onViewHistory, onViewFavorites }: UserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem 
           onClick={handleSignOut} 
-          className="cursor-pointer text-red-600 focus:text-red-600"
+          className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
           disabled={loading}
         >
           <LogOut className="mr-2 h-4 w-4" />

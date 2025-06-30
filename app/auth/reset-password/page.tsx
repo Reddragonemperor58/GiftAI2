@@ -51,28 +51,55 @@ export default function ResetPassword() {
   const passwordStrength = getPasswordStrength(formData.password);
 
   useEffect(() => {
-    const checkSession = async () => {
+    const handleAuthCallback = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        // First, handle the auth callback from the URL hash
+        const { data, error } = await supabase.auth.getSession();
         
         if (error) {
+          console.error('Session error:', error);
           throw error;
         }
 
-        if (session) {
+        // Check if we have URL fragments (hash) that need to be processed
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        const type = hashParams.get('type');
+
+        if (type === 'recovery' && accessToken && refreshToken) {
+          // Set the session with the tokens from the URL
+          const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+
+          if (sessionError) {
+            throw sessionError;
+          }
+
+          if (sessionData.session) {
+            setIsValidSession(true);
+            // Clean up the URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+          } else {
+            throw new Error('Failed to establish session');
+          }
+        } else if (data.session) {
+          // We already have a valid session
           setIsValidSession(true);
         } else {
-          setError('Invalid or expired reset link. Please request a new password reset.');
+          throw new Error('Invalid or expired reset link');
         }
       } catch (err: any) {
-        console.error('Session check error:', err);
+        console.error('Auth callback error:', err);
         setError('Invalid or expired reset link. Please request a new password reset.');
       } finally {
         setCheckingSession(false);
       }
     };
 
-    checkSession();
+    handleAuthCallback();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -101,6 +128,7 @@ export default function ResetPassword() {
         router.push('/');
       }, 3000);
     } catch (err: any) {
+      console.error('Password update error:', err);
       setError(err.message || 'Failed to update password');
     } finally {
       setLoading(false);
@@ -144,13 +172,19 @@ export default function ResetPassword() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
             
-            <Button 
-              onClick={() => router.push('/')}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-            >
-              <Home className="mr-2 h-4 w-4" />
-              Return to Home
-            </Button>
+            <div className="space-y-3">
+              <p className="text-sm text-gray-600 text-center">
+                Password reset links expire after a certain time for security reasons. Please request a new one.
+              </p>
+              
+              <Button 
+                onClick={() => router.push('/')}
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              >
+                <Home className="mr-2 h-4 w-4" />
+                Return to Home & Request New Reset
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

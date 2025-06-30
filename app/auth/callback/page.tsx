@@ -18,27 +18,76 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession();
-        
+        // Handle the auth callback from URL hash parameters
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        const type = hashParams.get('type');
+        const error = hashParams.get('error');
+        const errorDescription = hashParams.get('error_description');
+
+        // Check for errors first
         if (error) {
-          throw error;
+          throw new Error(errorDescription || error);
         }
 
-        if (data.session) {
-          setSuccess(true);
-          // Redirect to home page after successful authentication
-          setTimeout(() => {
-            router.push('/');
-          }, 2000);
-        } else {
-          // Handle the auth callback
-          const { error: callbackError } = await supabase.auth.getSession();
-          if (callbackError) {
-            throw callbackError;
+        // Handle different callback types
+        if (type === 'recovery') {
+          // This is a password reset callback - redirect to reset password page
+          if (accessToken && refreshToken) {
+            // Set the session for password reset
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken
+            });
+
+            if (sessionError) {
+              throw sessionError;
+            }
+
+            // Redirect to password reset page
+            router.push('/auth/reset-password');
+            return;
+          } else {
+            throw new Error('Invalid password reset link');
           }
+        } else if (type === 'signup' || accessToken) {
+          // This is an email confirmation callback
+          if (accessToken && refreshToken) {
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken
+            });
+
+            if (sessionError) {
+              throw sessionError;
+            }
+
+            setSuccess(true);
+            // Redirect to home page after successful email confirmation
+            setTimeout(() => {
+              router.push('/');
+            }, 2000);
+          } else {
+            throw new Error('Invalid confirmation link');
+          }
+        } else {
+          // Check if we have an existing session
+          const { data, error: sessionError } = await supabase.auth.getSession();
           
-          // If no session, redirect to home
-          router.push('/');
+          if (sessionError) {
+            throw sessionError;
+          }
+
+          if (data.session) {
+            setSuccess(true);
+            setTimeout(() => {
+              router.push('/');
+            }, 2000);
+          } else {
+            // No session and no callback parameters - redirect to home
+            router.push('/');
+          }
         }
       } catch (err: any) {
         console.error('Auth callback error:', err);
@@ -59,8 +108,8 @@ export default function AuthCallback() {
             <div className="text-center space-y-4">
               <Loader2 className="h-12 w-12 animate-spin mx-auto text-purple-500" />
               <div>
-                <h2 className="text-xl font-semibold text-gray-800">Confirming your account...</h2>
-                <p className="text-gray-600 mt-2">Please wait while we verify your email.</p>
+                <h2 className="text-xl font-semibold text-gray-800">Processing your request...</h2>
+                <p className="text-gray-600 mt-2">Please wait while we verify your information.</p>
               </div>
             </div>
           </CardContent>
@@ -79,7 +128,7 @@ export default function AuthCallback() {
               Authentication Failed
             </CardTitle>
             <CardDescription>
-              There was a problem confirming your account
+              There was a problem processing your request
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -88,13 +137,19 @@ export default function AuthCallback() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
             
-            <Button 
-              onClick={() => router.push('/')}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-            >
-              <Home className="mr-2 h-4 w-4" />
-              Return to Home
-            </Button>
+            <div className="space-y-3">
+              <p className="text-sm text-gray-600 text-center">
+                This could be due to an expired or invalid link. Please try requesting a new one.
+              </p>
+              
+              <Button 
+                onClick={() => router.push('/')}
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              >
+                <Home className="mr-2 h-4 w-4" />
+                Return to Home
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -108,10 +163,10 @@ export default function AuthCallback() {
           <CardHeader className="text-center">
             <CardTitle className="text-xl font-semibold text-green-600 flex items-center justify-center gap-2">
               <CheckCircle className="h-6 w-6" />
-              Email Confirmed!
+              Success!
             </CardTitle>
             <CardDescription>
-              Your account has been successfully verified
+              Your request has been processed successfully
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

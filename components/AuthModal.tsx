@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+<<<<<<< HEAD
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
@@ -24,6 +25,10 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { signIn, signUp, resetPassword, resendConfirmation, getAuthErrorMessage, isEmailConfirmed } from '@/lib/auth';
+=======
+import { Loader2, Mail, Lock, User } from 'lucide-react';
+import { signIn, signUp } from '@/lib/auth';
+>>>>>>> 8344bfa6dd8885c404265f805a3b5044bbf07f87
 import { useAuth } from '@/hooks/useAuth';
 
 interface AuthModalProps {
@@ -32,6 +37,7 @@ interface AuthModalProps {
   onSuccess?: () => void;
 }
 
+<<<<<<< HEAD
 type AuthView = 'signin' | 'signup' | 'forgot-password' | 'email-confirmation';
 
 export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
@@ -44,6 +50,12 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [rememberMe, setRememberMe] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
+=======
+export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('signin');
+>>>>>>> 8344bfa6dd8885c404265f805a3b5044bbf07f87
   const { refreshProfile } = useAuth();
 
   // Sign in form state
@@ -60,6 +72,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     confirmPassword: '',
   });
 
+<<<<<<< HEAD
   // Forgot password form state
   const [forgotPasswordData, setForgotPasswordData] = useState({
     email: '',
@@ -88,10 +101,13 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
   const passwordStrength = getPasswordStrength(signUpData.password);
 
+=======
+>>>>>>> 8344bfa6dd8885c404265f805a3b5044bbf07f87
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+<<<<<<< HEAD
     setSuccess('');
 
     try {
@@ -113,6 +129,16 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
       }, 1000);
     } catch (err: any) {
       setError(getAuthErrorMessage(err));
+=======
+
+    try {
+      await signIn(signInData.email, signInData.password);
+      await refreshProfile();
+      onSuccess?.();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign in');
+>>>>>>> 8344bfa6dd8885c404265f805a3b5044bbf07f87
     } finally {
       setLoading(false);
     }
@@ -122,7 +148,10 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     e.preventDefault();
     setLoading(true);
     setError('');
+<<<<<<< HEAD
     setSuccess('');
+=======
+>>>>>>> 8344bfa6dd8885c404265f805a3b5044bbf07f87
 
     if (signUpData.password !== signUpData.confirmPassword) {
       setError('Passwords do not match');
@@ -136,6 +165,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
       return;
     }
 
+<<<<<<< HEAD
     if (!acceptTerms) {
       setError('Please accept the terms and conditions');
       setLoading(false);
@@ -180,6 +210,15 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
       setSuccess('Confirmation email sent! Check your inbox.');
     } catch (err: any) {
       setError(getAuthErrorMessage(err));
+=======
+    try {
+      await signUp(signUpData.email, signUpData.password, signUpData.fullName);
+      await refreshProfile();
+      onSuccess?.();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign up');
+>>>>>>> 8344bfa6dd8885c404265f805a3b5044bbf07f87
     } finally {
       setLoading(false);
     }
@@ -188,6 +227,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const resetForm = () => {
     setSignInData({ email: '', password: '' });
     setSignUpData({ email: '', password: '', fullName: '', confirmPassword: '' });
+<<<<<<< HEAD
     setForgotPasswordData({ email: '' });
     setError('');
     setSuccess('');
@@ -198,6 +238,10 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     setAcceptTerms(false);
     setPendingEmail('');
     setActiveView('signin');
+=======
+    setError('');
+    setLoading(false);
+>>>>>>> 8344bfa6dd8885c404265f805a3b5044bbf07f87
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -207,6 +251,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     }
   };
 
+<<<<<<< HEAD
   const renderSignInForm = () => (
     <Card className="border-0 shadow-none">
       <CardHeader className="text-center pb-4">
@@ -658,10 +703,13 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     </Card>
   );
 
+=======
+>>>>>>> 8344bfa6dd8885c404265f805a3b5044bbf07f87
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
+<<<<<<< HEAD
           <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
             <Sparkles className="h-6 w-6 text-purple-600" />
             {activeView === 'email-confirmation' ? 'Email Confirmation' : 'Welcome to GiftAI'}
@@ -699,6 +747,182 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             </div>
           </div>
         )}
+=======
+          <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            Welcome to GiftAI
+          </DialogTitle>
+        </DialogHeader>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="signin">Sign In</TabsTrigger>
+            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="signin">
+            <Card className="border-0 shadow-none">
+              <CardHeader className="text-center pb-4">
+                <CardDescription>
+                  Sign in to save your gift searches and get personalized recommendations
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="signin-email"
+                        type="email"
+                        placeholder="Enter your email"
+                        value={signInData.email}
+                        onChange={(e) => setSignInData(prev => ({ ...prev, email: e.target.value }))}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="signin-password"
+                        type="password"
+                        placeholder="Enter your password"
+                        value={signInData.password}
+                        onChange={(e) => setSignInData(prev => ({ ...prev, password: e.target.value }))}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+                      {error}
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing In...
+                      </>
+                    ) : (
+                      'Sign In'
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="signup">
+            <Card className="border-0 shadow-none">
+              <CardHeader className="text-center pb-4">
+                <CardDescription>
+                  Create an account to get personalized gift recommendations
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-name">Full Name</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="signup-name"
+                        type="text"
+                        placeholder="Enter your full name"
+                        value={signUpData.fullName}
+                        onChange={(e) => setSignUpData(prev => ({ ...prev, fullName: e.target.value }))}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="signup-email"
+                        type="email"
+                        placeholder="Enter your email"
+                        value={signUpData.email}
+                        onChange={(e) => setSignUpData(prev => ({ ...prev, email: e.target.value }))}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="signup-password"
+                        type="password"
+                        placeholder="Create a password (min 6 characters)"
+                        value={signUpData.password}
+                        onChange={(e) => setSignUpData(prev => ({ ...prev, password: e.target.value }))}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-confirm">Confirm Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="signup-confirm"
+                        type="password"
+                        placeholder="Confirm your password"
+                        value={signUpData.confirmPassword}
+                        onChange={(e) => setSignUpData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+                      {error}
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating Account...
+                      </>
+                    ) : (
+                      'Create Account'
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+>>>>>>> 8344bfa6dd8885c404265f805a3b5044bbf07f87
       </DialogContent>
     </Dialog>
   );

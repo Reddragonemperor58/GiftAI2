@@ -14,7 +14,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { AuthModal } from '@/components/AuthModal';
 import { UserMenu } from '@/components/UserMenu';
 import { ChatSidebar } from '@/components/ChatSidebar';
+<<<<<<< HEAD
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
+=======
+>>>>>>> 8344bfa6dd8885c404265f805a3b5044bbf07f87
 import { getCurrencyForLocation, formatCurrency, getSuggestedBudgets } from '@/lib/currency';
 import { type GiftSearchWithSuggestions } from '@/lib/gifts';
 
@@ -207,9 +210,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+<<<<<<< HEAD
       {/* Email Verification Banner */}
       <EmailVerificationBanner />
 
+=======
+>>>>>>> 8344bfa6dd8885c404265f805a3b5044bbf07f87
       {/* Chat Sidebar */}
       <ChatSidebar
         isOpen={showChatSidebar}
